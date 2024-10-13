@@ -54,9 +54,20 @@ export async function uploadImage(formData: FormData): Promise<
             public_id: imagePublicId,
             tags: isPublic ? ['public'] : undefined,
             context: description ? `description="${description}"` : undefined,
+            moderation: 'aws_rek',
           },
           (error, result) => {
             if (error) reject(error);
+            if (
+              result &&
+              (result.moderation[0] as unknown as { status: string }).status ===
+                'rejected'
+            )
+              reject(
+                new Error(
+                  'Image does not comply with our content moderation policy',
+                ),
+              );
             else resolve(result);
           },
         )
