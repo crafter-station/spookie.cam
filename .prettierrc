@@ -1,0 +1,28 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": [
+    "^react$",
+    "^next/(.*)$",
+
+    "",
+
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@/db$",
+    "^@/db/(.*)$",
+    "",
+    "^@/components/ui/(.*)$",
+
+    "^@/components/(.*)$",
+    "",
+    "^@/lib/(.*)$",
+    "",
+    "^[./]"
+  ],
+  "importOrderTypeScriptVersion": "5.0.0"
+}
