@@ -2,8 +2,6 @@
 
 import React from 'react';
 
-import { CldImage } from 'next-cloudinary';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { DitheredImage } from '@/components/dithered-image';
 
 import { ImageUploadDialogContent } from './dialog-content';
 
@@ -43,14 +42,8 @@ export default function ImageUploader() {
       </Dialog>
 
       {uploadedPublicId && (
-        <div className="mt-4 h-64 rounded-lg">
-          <CldImage
-            src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/e_ordered_dither:3/e_oil_paint:5/e_blackwhite:30/v1/${uploadedPublicId}.jpg`}
-            width={500}
-            height={500}
-            preserveTransformations
-            alt="Description of my image"
-          />
+        <div className="mt-4 h-64">
+          <DitheredImage public_id={uploadedPublicId} />
         </div>
       )}
     </div>

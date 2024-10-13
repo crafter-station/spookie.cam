@@ -1,6 +1,7 @@
 'use server';
 
 import { v2 as cloudinary } from 'cloudinary';
+import { z } from 'zod';
 
 import { nanoid } from '@/lib/utils';
 
@@ -9,6 +10,11 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+const isPublicSchema = z
+  .enum(['on', 'off'])
+  .nullish()
+  .transform((v) => v === 'on');
 
 export async function uploadImage(formData: FormData): Promise<
   | {
@@ -24,6 +30,8 @@ export async function uploadImage(formData: FormData): Promise<
     const image = formData.get('image') as File;
     if (!image) throw new Error('No image attached');
 
+    const isPublic = isPublicSchema.parse(formData.get('public'));
+
     const imagePublicId = nanoid();
 
     // Convert File to buffer
@@ -37,6 +45,7 @@ export async function uploadImage(formData: FormData): Promise<
           {
             folder: process.env.CLOUDINARY_FOLDER_NAME,
             public_id: imagePublicId,
+            tags: isPublic ? ['public'] : undefined,
           },
           (error, result) => {
             if (error) reject(error);
@@ -50,7 +59,7 @@ export async function uploadImage(formData: FormData): Promise<
       success: true,
       data: {
         imagePublicId: process.env.CLOUDINARY_FOLDER_NAME + '/' + imagePublicId,
-        isPublic: true,
+        isPublic,
       },
     };
   } catch (error) {

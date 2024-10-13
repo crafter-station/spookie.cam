@@ -7,6 +7,8 @@ import { Upload } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 import { cn } from '@/lib/utils';
 
@@ -96,6 +98,10 @@ export function ImageUploadDialogContent({
             <p className="mt-2 text-xs text-gray-400">or click to select</p>
           </div>
         )}
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch id="public" name="public" />
+        <Label htmlFor="public">Public</Label>
       </div>
       <Button
         type="submit"
