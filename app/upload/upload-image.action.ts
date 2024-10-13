@@ -3,6 +3,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { z } from 'zod';
 
+import { getUserId } from '@/lib/get-user-id';
 import { nanoid } from '@/lib/utils';
 
 cloudinary.config({
@@ -16,9 +17,9 @@ const isPublicSchema = z
   .nullish()
   .transform((v) => v === 'on');
 
-const descriptionSchema = z
+const captionSchema = z
   .string()
-  .max(100)
+  .max(255)
   .nullish()
   .transform((x) => (x ? x.replace(/"/g, "'") : null)); // security
 
@@ -33,11 +34,13 @@ export async function uploadImage(formData: FormData): Promise<
   | { success: false; error: string }
 > {
   try {
+    const userId = await getUserId();
+
     const image = formData.get('image') as File;
     if (!image) throw new Error('No image attached');
 
     const isPublic = isPublicSchema.parse(formData.get('is_public'));
-    const description = descriptionSchema.parse(formData.get('description'));
+    const caption = captionSchema.parse(formData.get('caption'));
 
     const imagePublicId = nanoid();
 
@@ -53,7 +56,9 @@ export async function uploadImage(formData: FormData): Promise<
             folder: process.env.CLOUDINARY_FOLDER_NAME,
             public_id: imagePublicId,
             tags: isPublic ? ['public'] : undefined,
-            context: description ? `description="${description}"` : undefined,
+            context: caption
+              ? `caption="${caption}"|user_id="${userId}"`
+              : `user_id="${userId}"`,
             moderation: 'aws_rek',
           },
           (error, result) => {

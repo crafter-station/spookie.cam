@@ -24,6 +24,8 @@ export const DitheredImage = ({
   const [isInViewport, setIsInViewport] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
 
+  const [removeBg, setRemoveBg] = React.useState(true);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -62,7 +64,7 @@ export const DitheredImage = ({
       changeFilter();
 
       // Set up interval to change filter every 300ms
-      intervalId = setInterval(changeFilter, 100);
+      intervalId = setInterval(changeFilter, 150);
     }
 
     // Clean up interval when component unmounts or leaves viewport
@@ -76,12 +78,13 @@ export const DitheredImage = ({
   return (
     <div ref={imageRef}>
       <CldImage
-        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/e_background_removal/b_rgb:000000/ar_4:3,c_auto_pad,g_auto/${filter}/v1/${public_id}.png`}
+        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload${removeBg ? '/e_background_removal' : ''}/b_rgb:000000/ar_4:3,c_auto_pad,g_auto/${filter}/v1/${public_id}.png`}
         width={500}
         height={500}
         preserveTransformations
         alt={alt || 'a spookie image'}
         className="h-auto w-auto"
+        onError={() => setRemoveBg(false)}
       />
     </div>
   );

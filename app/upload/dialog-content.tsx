@@ -104,7 +104,7 @@ export function ImageUploadDialogContent({
         <Switch id="is_public" name="is_public" />
         <Label htmlFor="is_public">Public</Label>
       </div>
-      <Input name="description" placeholder="say something..." />
+      <Input name="caption" placeholder="say something..." />
       <Button
         type="submit"
         disabled={!previewImage || isPending}
