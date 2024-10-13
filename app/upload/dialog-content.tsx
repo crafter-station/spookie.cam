@@ -7,6 +7,7 @@ import { Upload } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
@@ -75,7 +76,7 @@ export function ImageUploadDialogContent({
   });
 
   return (
-    <form className="flex flex-col items-center" action={mutate}>
+    <form className="flex flex-col items-center space-y-6" action={mutate}>
       <div
         {...getRootProps()}
         className={cn(
@@ -100,9 +101,10 @@ export function ImageUploadDialogContent({
         )}
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="public" name="public" />
-        <Label htmlFor="public">Public</Label>
+        <Switch id="is_public" name="is_public" />
+        <Label htmlFor="is_public">Public</Label>
       </div>
+      <Input name="description" placeholder="say something..." />
       <Button
         type="submit"
         disabled={!previewImage || isPending}

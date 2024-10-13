@@ -13,7 +13,13 @@ const options = [
   'e_colorize:10/e_ordered_dither:10/e_oil_paint:50/e_blackwhite:20/e_negate',
 ];
 
-export const DitheredImage = ({ public_id }: { public_id: string }) => {
+export const DitheredImage = ({
+  public_id,
+  alt,
+}: {
+  public_id: string;
+  alt?: string | undefined;
+}) => {
   const [filter, setFilter] = useState<string>(options[0]);
   const [isInViewport, setIsInViewport] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
@@ -66,15 +72,15 @@ export const DitheredImage = ({ public_id }: { public_id: string }) => {
       }
     };
   }, [isInViewport]);
-
+  // e_background_removal/
   return (
     <div ref={imageRef}>
       <CldImage
-        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/e_background_removal/b_rgb:000000/${filter}/v1/${public_id}.png`}
+        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/e_background_removal/b_rgb:000000/ar_4:3,c_auto_pad,g_auto/${filter}/v1/${public_id}.png`}
         width={500}
         height={500}
         preserveTransformations
-        alt="Description of my image"
+        alt={alt || 'a spookie image'}
         className="h-auto w-auto"
       />
     </div>

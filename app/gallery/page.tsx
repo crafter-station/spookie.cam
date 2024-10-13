@@ -11,10 +11,14 @@ cloudinary.config({
 export default async function Page() {
   const data = (await cloudinary.search
     .expression('tags=public')
+    .fields('context')
     .execute()) as {
     total_count: number;
     resources: {
       public_id: string;
+      context: {
+        description: string | undefined;
+      };
     }[];
   };
 
@@ -22,10 +26,25 @@ export default async function Page() {
     <div className="mx-auto max-w-6xl">
       <h1>Gallery</h1>
 
-      <div className="grid grid-cols-1 gap-12">
-        {data.resources.map(({ public_id }) => (
-          <div key={public_id} className="flex justify-center">
-            <DitheredImage public_id={public_id} />
+      <div className="grid grid-cols-1 gap-16">
+        {data.resources.map(({ public_id, context }) => (
+          <div
+            key={public_id}
+            className="flex flex-col items-center justify-center space-y-2"
+          >
+            <DitheredImage
+              public_id={public_id}
+              alt={
+                context.description
+                  ? context.description.replace(/"/g, '')
+                  : undefined
+              }
+            />
+            {context.description ? (
+              <p className="font-mono text-xs italic text-muted-foreground">
+                {context.description.replace(/"/g, '')}
+              </p>
+            ) : null}
           </div>
         ))}
       </div>

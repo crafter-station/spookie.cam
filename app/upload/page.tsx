@@ -36,7 +36,7 @@ export default function ImageUploader() {
           <DialogHeader>
             <DialogTitle>Upload an Image</DialogTitle>
           </DialogHeader>
-          <DialogDescription>We support al image formats!</DialogDescription>
+          <DialogDescription>We support all image formats!</DialogDescription>
           <ImageUploadDialogContent onImageUploaded={handleOnImageUploaded} />
         </DialogContent>
       </Dialog>

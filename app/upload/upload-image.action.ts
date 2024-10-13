@@ -16,6 +16,12 @@ const isPublicSchema = z
   .nullish()
   .transform((v) => v === 'on');
 
+const descriptionSchema = z
+  .string()
+  .max(100)
+  .nullish()
+  .transform((x) => (x ? x.replace(/"/g, "'") : null)); // security
+
 export async function uploadImage(formData: FormData): Promise<
   | {
       success: true;
@@ -30,7 +36,8 @@ export async function uploadImage(formData: FormData): Promise<
     const image = formData.get('image') as File;
     if (!image) throw new Error('No image attached');
 
-    const isPublic = isPublicSchema.parse(formData.get('public'));
+    const isPublic = isPublicSchema.parse(formData.get('is_public'));
+    const description = descriptionSchema.parse(formData.get('description'));
 
     const imagePublicId = nanoid();
 
@@ -46,6 +53,7 @@ export async function uploadImage(formData: FormData): Promise<
             folder: process.env.CLOUDINARY_FOLDER_NAME,
             public_id: imagePublicId,
             tags: isPublic ? ['public'] : undefined,
+            context: description ? `description="${description}"` : undefined,
           },
           (error, result) => {
             if (error) reject(error);
