@@ -1,9 +1,9 @@
-import SpookyImage from "@/components/spooky-image";
+import SpookyImage from '@/components/spooky-image';
 
 export default function Home() {
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">
+      <h1 className="mb-6 text-center text-3xl font-bold">
         Welcome to Spookam
       </h1>
       <SpookyImage />

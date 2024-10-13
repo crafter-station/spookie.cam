@@ -1,25 +1,28 @@
 // components/SpookyImage.tsx
-"use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Slider } from "@/components/ui/slider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
+
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { debounce } from "@/lib/utils";
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+
+import { debounce } from '@/lib/utils';
 
 type FilterType =
-  | "atkinson"
-  | "spooky"
-  | "vampireGlow"
-  | "zombieDecay"
-  | "ghostlyFade"
-  | "witchHex"
-  | "werewolfFur";
+  | 'atkinson'
+  | 'spooky'
+  | 'vampireGlow'
+  | 'zombieDecay'
+  | 'ghostlyFade'
+  | 'witchHex'
+  | 'werewolfFur';
 
 const workerCode = `
   const applyAtkinsonDither = (imageData, threshold) => {
@@ -315,10 +318,10 @@ const SpookyImage: React.FC = () => {
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [processedImageData, setProcessedImageData] =
     useState<ImageData | null>(null);
-  const [filterType, setFilterType] = useState<FilterType>("atkinson");
+  const [filterType, setFilterType] = useState<FilterType>('atkinson');
 
   useEffect(() => {
-    const blob = new Blob([workerCode], { type: "application/javascript" });
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
     workerRef.current = new Worker(URL.createObjectURL(blob));
     workerRef.current.onmessage = (event) => {
       setProcessedImageData(event.data);
@@ -349,7 +352,7 @@ const SpookyImage: React.FC = () => {
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    if (filterType !== "atkinson") {
+    if (filterType !== 'atkinson') {
       animate();
     } else {
       processImage();
@@ -364,7 +367,7 @@ const SpookyImage: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas || !imageData || !processedImageData) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     ctx.putImageData(processedImageData, 0, 0);
@@ -375,7 +378,7 @@ const SpookyImage: React.FC = () => {
     ctx.beginPath();
     ctx.moveTo(dragX, 0);
     ctx.lineTo(dragX, canvas.height);
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = 'white';
     ctx.lineWidth = 2;
     ctx.stroke();
   }, [imageData, processedImageData, dragPosition]);
@@ -384,11 +387,11 @@ const SpookyImage: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const img = new Image();
-    img.src = "/sticker.webp";
+    img.src = '/sticker.webp';
     img.onload = () => {
       const scaleFactor = Math.min(1, 800 / Math.max(img.width, img.height));
       canvas.width = img.width * scaleFactor;
@@ -438,21 +441,21 @@ const SpookyImage: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <Card className="mx-auto w-full max-w-3xl">
       <CardHeader>
         <CardTitle>Spooky Image</CardTitle>
       </CardHeader>
       <CardContent>
         <div
-          className="relative cursor-ew-resize mb-4"
+          className="relative mb-4 cursor-ew-resize"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          <canvas ref={canvasRef} className="w-full h-auto"></canvas>
+          <canvas ref={canvasRef} className="h-auto w-full"></canvas>
         </div>
-        <div className="flex space-x-4 mb-4">
+        <div className="mb-4 flex space-x-4">
           <Select onValueChange={handleFilterChange} value={filterType}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select filter" />

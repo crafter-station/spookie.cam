@@ -2,7 +2,7 @@
 
 const applyAtkinsonDither = (
   imageData: ImageData,
-  threshold: number
+  threshold: number,
 ): ImageData => {
   const data = new Uint8ClampedArray(imageData.data);
   const width = imageData.width;
@@ -33,7 +33,7 @@ const applyAtkinsonDither = (
 
 const applySpookyEffects = (
   imageData: ImageData,
-  threshold: number
+  threshold: number,
 ): ImageData => {
   const data = new Uint8ClampedArray(imageData.data);
   const width = imageData.width;
@@ -55,7 +55,7 @@ const applySpookyEffects = (
       // Apply vertical sync offset
       const sourceY = Math.max(
         0,
-        Math.min(height - 1, y + Math.round(verticalSyncOffset))
+        Math.min(height - 1, y + Math.round(verticalSyncOffset)),
       );
       const sourceIdx = (sourceY * width + x) * 4;
 
@@ -63,7 +63,7 @@ const applySpookyEffects = (
       for (let i = 0; i < 3; i++) {
         data[idx + i] = Math.min(
           255,
-          Math.max(0, (data[sourceIdx + i] - 128) * 1.1 + 128)
+          Math.max(0, (data[sourceIdx + i] - 128) * 1.1 + 128),
         );
       }
 
@@ -77,7 +77,7 @@ const applySpookyEffects = (
       const distanceToCenter =
         Math.sqrt(
           Math.pow((x - width / 2) / (width / 2), 2) +
-            Math.pow((y - height / 2) / (height / 2), 2)
+            Math.pow((y - height / 2) / (height / 2), 2),
         ) / 1.5;
       const vignette = Math.max(0, 1 - distanceToCenter);
       for (let i = 0; i < 3; i++) {
@@ -91,7 +91,7 @@ const applySpookyEffects = (
 
       if (Math.sin(time * glitchPeriod + y * 0.1) > 1 - glitchIntensity) {
         const glitchOffset = Math.floor(
-          Math.sin(time * 2 + y * 0.2) * glitchAmplitude
+          Math.sin(time * 2 + y * 0.2) * glitchAmplitude,
         );
         const glitchIdx = idx + glitchOffset * 4;
 
@@ -154,7 +154,7 @@ self.onmessage = (event: MessageEvent) => {
   const { imageData, filterType, threshold } = event.data;
   let result: ImageData;
 
-  if (filterType === "atkinson") {
+  if (filterType === 'atkinson') {
     result = applyAtkinsonDither(imageData, threshold);
   } else {
     result = applySpookyEffects(imageData, threshold);
