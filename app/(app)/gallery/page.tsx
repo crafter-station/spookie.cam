@@ -9,6 +9,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+export const revalidate = 30;
+
 export default async function Page() {
   const data = (await cloudinary.search
     .expression('tags=public')
