@@ -1,9 +1,12 @@
 'use server';
 
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { z } from 'zod';
 
+import { EmbeddingInput, getEmbeddings } from '@/lib/get-embeddings';
+import { getUserId } from '@/lib/get-user-id';
 import { nanoid } from '@/lib/utils';
+import { vectorIndex } from '@/lib/vector';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -16,9 +19,9 @@ const isPublicSchema = z
   .nullish()
   .transform((v) => v === 'on');
 
-const descriptionSchema = z
+const captionSchema = z
   .string()
-  .max(100)
+  .max(255)
   .nullish()
   .transform((x) => (x ? x.replace(/"/g, "'") : null)); // security
 
@@ -33,11 +36,13 @@ export async function uploadImage(formData: FormData): Promise<
   | { success: false; error: string }
 > {
   try {
+    const userId = await getUserId();
+
     const image = formData.get('image') as File;
     if (!image) throw new Error('No image attached');
 
     const isPublic = isPublicSchema.parse(formData.get('is_public'));
-    const description = descriptionSchema.parse(formData.get('description'));
+    const caption = captionSchema.parse(formData.get('caption'));
 
     const imagePublicId = nanoid();
 
@@ -46,14 +51,16 @@ export async function uploadImage(formData: FormData): Promise<
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to Cloudinary
-    await new Promise((resolve, reject) => {
+    const { url } = (await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
             folder: process.env.CLOUDINARY_FOLDER_NAME,
             public_id: imagePublicId,
             tags: isPublic ? ['public'] : undefined,
-            context: description ? `description="${description}"` : undefined,
+            context: caption
+              ? `caption="${caption}"|user_id="${userId}"`
+              : `user_id="${userId}"`,
             moderation: 'aws_rek',
           },
           (error, result) => {
@@ -68,11 +75,34 @@ export async function uploadImage(formData: FormData): Promise<
                   'Image does not comply with our content moderation policy',
                 ),
               );
+            if (!result) throw new Error('Error talking with cloudinary :(');
             else resolve(result);
           },
         )
         .end(buffer);
-    });
+    })) as UploadApiResponse;
+
+    const inputEmbeddings: EmbeddingInput[] = [{ image: url }];
+    if (caption) {
+      inputEmbeddings.push({ text: caption });
+    }
+    const embeddingsResponse = await getEmbeddings(inputEmbeddings);
+
+    const indexInput = [
+      {
+        id: 'e_' + imagePublicId,
+        vector: embeddingsResponse.data[0].embedding,
+      },
+    ];
+
+    if (caption) {
+      indexInput.push({
+        id: 'c_' + imagePublicId,
+        vector: embeddingsResponse.data[1].embedding,
+      });
+    }
+
+    await vectorIndex.upsert(indexInput);
 
     return {
       success: true,

@@ -1,6 +1,9 @@
 import { v2 as cloudinary } from 'cloudinary';
 
+import { CardDescription, CardTitle } from '@/components/ui/card';
 import { DitheredImage } from '@/components/dithered-image';
+
+import { getUserId } from '@/lib/get-user-id';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -9,22 +12,28 @@ cloudinary.config({
 });
 
 export default async function Page() {
-  const data = (await cloudinary.search
-    .expression('tags=public')
-    .fields('context')
-    .execute()) as {
-    total_count: number;
+  const userId = await getUserId();
+  const data = (await cloudinary.api.resources_by_context(
+    'user_id',
+    `"${userId}"`,
+    {
+      context: true,
+    },
+  )) as {
     resources: {
       public_id: string;
       context: {
-        description: string | undefined;
+        custom: {
+          caption: string | undefined;
+        };
       };
     }[];
   };
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <h1>Gallery</h1>
+    <>
+      <CardTitle>Your pics</CardTitle>
+      <CardDescription>Only you can see them*</CardDescription>
 
       <div className="grid grid-cols-1 gap-16">
         {data.resources.map(({ public_id, context }) => (
@@ -35,19 +44,19 @@ export default async function Page() {
             <DitheredImage
               public_id={public_id}
               alt={
-                context.description
-                  ? context.description.replace(/"/g, '')
+                context.custom.caption
+                  ? context.custom.caption.replace(/"/g, '')
                   : undefined
               }
             />
-            {context.description ? (
+            {context.custom.caption ? (
               <p className="font-mono text-xs italic text-muted-foreground">
-                {context.description.replace(/"/g, '')}
+                {context.custom.caption.replace(/"/g, '')}
               </p>
             ) : null}
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }

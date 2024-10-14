@@ -5,6 +5,8 @@ import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 
+import { TooltipProvider } from '../ui/tooltip';
+
 const queryClient = new QueryClient();
 
 export const Providers = ({ children }: { children: ReactNode }) => {
@@ -14,7 +16,11 @@ export const Providers = ({ children }: { children: ReactNode }) => {
       defaultTheme="dark"
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </TooltipProvider>
     </ThemeProvider>
   );
 };
