@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 import { CldImage } from 'next-cloudinary';
 
@@ -13,10 +14,18 @@ const options = [
   'e_colorize:10/e_ordered_dither:10/e_oil_paint:50/e_blackwhite:20/e_negate',
 ];
 
+const sizes = {
+  sm: 300,
+  md: 500,
+  lg: 750,
+} as const;
+
 export const DitheredImage = ({
   public_id,
+  size,
   alt,
 }: {
+  size?: keyof typeof sizes;
   public_id: string;
   alt?: string | undefined;
 }) => {
@@ -76,15 +85,18 @@ export const DitheredImage = ({
   }, [isInViewport]);
   // e_background_removal/
   return (
-    <div ref={imageRef}>
+    <div ref={imageRef} className="relative">
       <CldImage
         src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload${removeBg ? '/e_background_removal' : ''}/b_rgb:000000/ar_4:3,c_auto_pad,g_auto/${filter}/v1/${public_id}.png`}
-        width={500}
-        height={500}
+        width={sizes[size || 'md'] ?? sizes['md']}
+        height={sizes[size || 'md'] ?? sizes['md']}
         preserveTransformations
         alt={alt || 'a spookie image'}
-        className="h-auto w-auto"
         onError={() => setRemoveBg(false)}
+      />
+      <Link
+        href={`/pic/${public_id.split('/')[1]}`}
+        className="absolute inset-0"
       />
     </div>
   );

@@ -22,7 +22,9 @@ export default async function Page() {
     resources: {
       public_id: string;
       context: {
-        caption: string | undefined;
+        custom: {
+          caption: string | undefined;
+        };
       };
     }[];
   };
@@ -40,12 +42,14 @@ export default async function Page() {
             <DitheredImage
               public_id={public_id}
               alt={
-                context.caption ? context.caption.replace(/"/g, '') : undefined
+                context.custom.caption
+                  ? context.custom.caption.replace(/"/g, '')
+                  : undefined
               }
             />
-            {context.caption ? (
+            {context.custom.caption ? (
               <p className="font-mono text-xs italic text-muted-foreground">
-                {context.caption.replace(/"/g, '')}
+                {context.custom.caption.replace(/"/g, '')}
               </p>
             ) : null}
           </div>

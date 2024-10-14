@@ -1,10 +1,12 @@
 'use server';
 
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { z } from 'zod';
 
+import { EmbeddingInput, getEmbeddings } from '@/lib/get-embeddings';
 import { getUserId } from '@/lib/get-user-id';
 import { nanoid } from '@/lib/utils';
+import { vectorIndex } from '@/lib/vector';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -49,7 +51,7 @@ export async function uploadImage(formData: FormData): Promise<
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to Cloudinary
-    await new Promise((resolve, reject) => {
+    const { url } = (await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
@@ -73,11 +75,34 @@ export async function uploadImage(formData: FormData): Promise<
                   'Image does not comply with our content moderation policy',
                 ),
               );
+            if (!result) throw new Error('Error talking with cloudinary :(');
             else resolve(result);
           },
         )
         .end(buffer);
-    });
+    })) as UploadApiResponse;
+
+    const inputEmbeddings: EmbeddingInput[] = [{ image: url }];
+    if (caption) {
+      inputEmbeddings.push({ text: caption });
+    }
+    const embeddingsResponse = await getEmbeddings(inputEmbeddings);
+
+    const indexInput = [
+      {
+        id: 'e_' + imagePublicId,
+        vector: embeddingsResponse.data[0].embedding,
+      },
+    ];
+
+    if (caption) {
+      indexInput.push({
+        id: 'c_' + imagePublicId,
+        vector: embeddingsResponse.data[1].embedding,
+      });
+    }
+
+    await vectorIndex.upsert(indexInput);
 
     return {
       success: true,
