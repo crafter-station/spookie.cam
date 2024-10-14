@@ -1,5 +1,13 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { InfoIcon } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
+import { CardDescription, CardTitle } from '@/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { DitheredImage } from '@/components/dithered-image';
 
 import { vectorIndex } from '@/lib/vector';
@@ -70,10 +78,27 @@ export default async function Page({ params }: { params: { id: string } }) {
       : null;
 
   return (
-    <div className="mx-auto my-8 max-w-6xl">
-      <h1 className="text-4xl font-bold">Single image</h1>
-
-      <div className="grid grid-cols-1 gap-16">
+    <>
+      <CardTitle className="flex items-center space-x-1">
+        It&apos;s you?
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size="icon" variant="ghost" className="size-5">
+              <InfoIcon className="size-3" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-64">
+            <p>
+              Only you can see this pic without having the link. This picture
+              isn&apos;t featured in any other page. Nobody can see this in
+              Gallery or the &quot;similar&quot; section in other pics. If you
+              want other people to see this, share the link with them.
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </CardTitle>
+      <CardDescription>buenas noches</CardDescription>
+      <div className="my-8 grid grid-cols-1 gap-16">
         <div
           key={image.public_id}
           className="flex flex-col items-center justify-center space-y-2"
@@ -97,7 +122,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
       {similar && similar.resources.length > 0 ? (
         <div className="mt-8 space-y-4">
-          <h2 className="text-2xl font-semibold">Similar</h2>
+          <CardTitle>Similar</CardTitle>
           <div className="grid grid-cols-3 gap-16">
             {similar.resources.map(({ public_id, context, tags }) =>
               public_id.split('/')[1] === params.id ||
@@ -126,6 +151,6 @@ export default async function Page({ params }: { params: { id: string } }) {
           </div>
         </div>
       ) : null}
-    </div>
+    </>
   );
 }

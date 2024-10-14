@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 
+import { CardDescription, CardTitle } from '@/components/ui/card';
 import { DitheredImage } from '@/components/dithered-image';
 
 import { getUserId } from '@/lib/get-user-id';
@@ -30,8 +31,9 @@ export default async function Page() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <h1>Mine</h1>
+    <>
+      <CardTitle>Your pics</CardTitle>
+      <CardDescription>Only you can see them*</CardDescription>
 
       <div className="grid grid-cols-1 gap-16">
         {data.resources.map(({ public_id, context }) => (
@@ -55,6 +57,6 @@ export default async function Page() {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
