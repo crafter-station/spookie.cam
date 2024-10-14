@@ -1,8 +1,11 @@
 'use server';
 
+import { headers } from 'next/headers';
+
 import { v2 as cloudinary } from 'cloudinary';
 import { z } from 'zod';
 
+import { hasLimitReached } from '@/lib/ratelimit';
 import { nanoid } from '@/lib/utils';
 
 cloudinary.config({
@@ -33,6 +36,10 @@ export async function uploadImage(formData: FormData): Promise<
   | { success: false; error: string }
 > {
   try {
+    const ip = headers().get('x-forwarded-for') ?? 'ip';
+    const limitReached = await hasLimitReached(ip);
+    if (limitReached) throw new Error('Rate limit reached');
+
     const image = formData.get('image') as File;
     if (!image) throw new Error('No image attached');
 
