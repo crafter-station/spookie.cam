@@ -1,10 +1,13 @@
 'use server';
 
+import { headers } from 'next/headers';
+
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { z } from 'zod';
 
 import { EmbeddingInput, getEmbeddings } from '@/lib/get-embeddings';
 import { getUserId } from '@/lib/get-user-id';
+import { hasLimitReached } from '@/lib/ratelimit';
 import { nanoid } from '@/lib/utils';
 import { vectorIndex } from '@/lib/vector';
 
@@ -36,6 +39,9 @@ export async function uploadImage(formData: FormData): Promise<
   | { success: false; error: string }
 > {
   try {
+    const ip = headers().get('x-forwarded-for') ?? 'ip';
+    const limitReached = await hasLimitReached(ip);
+    if (limitReached) throw new Error('Rate limit reached');
     const userId = await getUserId();
 
     const image = formData.get('image') as File;
