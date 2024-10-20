@@ -24,7 +24,7 @@ cloudinary.config({
 export const revalidate = 30;
 
 export function generateMetadata({ params }: { params: { id: string } }) {
-  const ogImageUrl = `https://${process.env.VERCEL_URL}/api/og/${params.id}`;
+  const ogImageUrl = `https://spookie.cam/api/og/${params.id}`;
 
   return {
     title: 'spookie.cam',
@@ -32,7 +32,7 @@ export function generateMetadata({ params }: { params: { id: string } }) {
     openGraph: {
       title: 'spookie.cam',
       description: 'Create your own spookie pics for free',
-      url: `https://${process.env.VERCEL_URL}/pic/${params.id}`,
+      url: `https://spookie.cam/pic/${params.id}`,
       siteName: 'spookie.cam',
       images: [
         {
