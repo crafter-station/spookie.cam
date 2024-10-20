@@ -12,6 +12,9 @@ import { DitheredImage } from '@/components/dithered-image';
 
 import { vectorIndex } from '@/lib/vector';
 
+import { ImageDownloadButton } from './download-button';
+import { ShareButton } from './share-button';
+
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -19,6 +22,38 @@ cloudinary.config({
 });
 
 export const revalidate = 30;
+
+export function generateMetadata({ params }: { params: { id: string } }) {
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/og/${params.id}`;
+
+  return {
+    title: 'spookie.cam',
+    description: 'Create your own spookie pics for free',
+    openGraph: {
+      title: 'spookie.cam',
+      description: 'Create your own spookie pics for free',
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/pic/${params.id}`,
+      siteName: 'spookie.cam',
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: 'spookie.cam',
+        },
+      ],
+      locale: 'en-US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'spookie.cam',
+      description: 'Create your own spookie pics for free',
+      images: [ogImageUrl],
+      creator: '@cuevaio',
+    },
+  };
+}
 
 export default async function Page({ params }: { params: { id: string } }) {
   const data = (await cloudinary.api.resources_by_ids(params.id, {
@@ -111,6 +146,10 @@ export default async function Page({ params }: { params: { id: string } }) {
               {image.context.custom?.caption.replace(/"/g, '')}
             </p>
           ) : null}
+          <div className="flex justify-between space-x-4">
+            <ImageDownloadButton id={image.public_id} />
+            <ShareButton id={image.public_id} />
+          </div>
         </div>
       </div>
 
