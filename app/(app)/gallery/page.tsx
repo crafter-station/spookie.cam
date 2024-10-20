@@ -37,7 +37,7 @@ export default async function Page() {
             className="flex flex-col items-center justify-center space-y-2"
           >
             <DitheredImage
-              public_id={public_id}
+              id={public_id}
               alt={
                 context.caption ? context.caption.replace(/"/g, '') : undefined
               }

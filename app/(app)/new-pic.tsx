@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useMutation } from '@tanstack/react-query';
-import { PlusIcon, Upload } from 'lucide-react';
+import { Loader2, PlusIcon, Upload } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 import { Button } from '@/components/ui/button';
@@ -66,9 +66,9 @@ export function NewPic() {
     onError: (error) => {
       alert(error.message);
     },
-    onSuccess: ({ imagePublicId }) => {
+    onSuccess: ({ id }) => {
       setIsDialogOpen(false);
-      router.push('/pic/' + imagePublicId.split('/')[1]);
+      router.push('/pic/' + id);
     },
   });
 
@@ -125,15 +125,22 @@ export function NewPic() {
             )}
           </div>
           <div className="flex items-center space-x-2">
-            <Switch id="is_public" name="is_public" />
+            <Switch id="is_public" name="is_public" disabled={isPending} />
             <Label htmlFor="is_public">Public</Label>
           </div>
-          <Input name="caption" placeholder="say something..." />
+          <Input
+            name="caption"
+            placeholder="say something..."
+            disabled={isPending}
+          />
           <Button
             type="submit"
             disabled={!previewImage || isPending}
             className="mt-4 w-full"
           >
+            {isPending ? (
+              <Loader2 className="mr-2 size-4 animate-spin" />
+            ) : null}
             Upload
           </Button>
         </form>

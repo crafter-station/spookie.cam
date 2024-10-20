@@ -19,12 +19,9 @@ cloudinary.config({
 });
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const data = (await cloudinary.api.resources_by_ids(
-    process.env.CLOUDINARY_FOLDER_NAME + '/' + params.id,
-    {
-      context: true,
-    },
-  )) as {
+  const data = (await cloudinary.api.resources_by_ids(params.id, {
+    context: true,
+  })) as {
     resources: {
       public_id: string;
       url: string;
@@ -38,7 +35,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   const image = data.resources[0];
 
-  const [vector] = await vectorIndex.fetch(['e_' + params.id], {
+  const [vector] = await vectorIndex.fetch(['image_' + params.id], {
     includeVectors: true,
   });
 
@@ -53,12 +50,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   const similar =
     similarIds.length > 0
       ? ((await cloudinary.api.resources_by_ids(
-          similarIds.map(
-            (x) =>
-              process.env.CLOUDINARY_FOLDER_NAME +
-              '/' +
-              (x.id as string).split('_')[1],
-          ),
+          similarIds.map((x) => (x.id as string).split('_')[1]),
           {
             context: true,
             tags: true,
@@ -105,7 +97,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         >
           <DitheredImage
             size="lg"
-            public_id={image.public_id}
+            id={image.public_id}
             alt={
               image.context?.custom.caption
                 ? image.context.custom.caption.replace(/"/g, '')
@@ -125,14 +117,13 @@ export default async function Page({ params }: { params: { id: string } }) {
           <CardTitle>Similar</CardTitle>
           <div className="grid grid-cols-3 gap-16">
             {similar.resources.map(({ public_id, context, tags }) =>
-              public_id.split('/')[1] === params.id ||
-              !tags.includes('public') ? null : (
+              public_id === params.id || !tags.includes('public') ? null : (
                 <div
                   key={public_id}
                   className="flex flex-col items-center justify-center space-y-2"
                 >
                   <DitheredImage
-                    public_id={public_id}
+                    id={public_id}
                     alt={
                       context?.custom?.caption
                         ? context.custom.caption.replace(/"/g, '')

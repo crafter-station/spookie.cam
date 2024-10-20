@@ -3,17 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
-import { CldImage } from 'next-cloudinary';
-
-const options = [
-  'e_contrast:50/e_ordered_dither:6/e_blackwhite:40',
-  'e_contrast:50/e_ordered_dither:6/e_blackwhite:40/e_negate',
-  'e_contrast:50/e_ordered_dither:6/e_oil_paint:30/e_blackwhite:40',
-  'e_colorize:10/e_ordered_dither:6/e_oil_paint:30/e_blackwhite:20/e_negate',
-  'e_contrast:50/e_ordered_dither:10/e_oil_paint:50/e_blackwhite:40',
-  'e_colorize:10/e_ordered_dither:10/e_oil_paint:50/e_blackwhite:20/e_negate',
-];
-
 const sizes = {
   sm: 300,
   md: 500,
@@ -21,83 +10,65 @@ const sizes = {
 } as const;
 
 export const DitheredImage = ({
-  public_id,
+  id,
   size,
   alt,
 }: {
   size?: keyof typeof sizes;
-  public_id: string;
+  id: string;
   alt?: string | undefined;
 }) => {
-  const [filter, setFilter] = useState<string>(options[0]);
-  const [isInViewport, setIsInViewport] = useState(false);
-  const imageRef = useRef<HTMLDivElement>(null);
-
-  const [removeBg, setRemoveBg] = React.useState(true);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const selectedSize = size || 'md';
 
   useEffect(() => {
+    if (!imgRef.current) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsInViewport(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          const img = imgRef.current;
+          if (img) {
+            img.src = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/multi/v1/dl_150/${id}_frame.gif`;
+          }
+          observer.unobserve(entry.target);
+        }
       },
       {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1, // Trigger when at least 10% of the image is visible
+        rootMargin: '500px',
       },
     );
 
-    const currentImageRef = imageRef.current;
-
-    if (currentImageRef) {
-      observer.observe(currentImageRef);
-    }
+    observer.observe(imgRef.current);
 
     return () => {
-      if (currentImageRef) {
-        observer.unobserve(currentImageRef);
+      if (imgRef.current) {
+        observer.unobserve(imgRef.current);
       }
     };
-  }, []);
+  }, [id]);
 
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-
-    if (isInViewport) {
-      const changeFilter = () => {
-        const randomIndex = Math.floor(Math.random() * options.length);
-        setFilter(options[randomIndex]);
-      };
-
-      // Initial change
-      changeFilter();
-
-      // Set up interval to change filter every 300ms
-      intervalId = setInterval(changeFilter, 150);
-    }
-
-    // Clean up interval when component unmounts or leaves viewport
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [isInViewport]);
-  // e_background_removal/
   return (
-    <div ref={imageRef} className="relative">
-      <CldImage
-        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload${removeBg ? '/e_background_removal' : ''}/b_rgb:000000/ar_4:3,c_auto_pad,g_auto/${filter}/v1/${public_id}.png`}
-        width={sizes[size || 'md'] ?? sizes['md']}
-        height={sizes[size || 'md'] ?? sizes['md']}
-        preserveTransformations
-        alt={alt || 'a spookie image'}
-        onError={() => setRemoveBg(false)}
+    <div
+      className="relative"
+      style={{ width: sizes[selectedSize], height: sizes[selectedSize] }}
+    >
+      <img
+        ref={imgRef}
+        alt={alt || 'a spooky image'}
+        width={sizes[selectedSize]}
+        height={sizes[selectedSize]}
+        onLoad={() => setIsLoaded(true)}
+        style={{
+          opacity: isLoaded ? 1 : 0,
+          transition: 'opacity 0.3s ease-in-out',
+          objectFit: 'cover',
+          width: '100%',
+          height: '100%',
+        }}
       />
-      <Link
-        href={`/pic/${public_id.split('/')[1]}`}
-        className="absolute inset-0"
-      />
+      <Link href={`/pic/${id}`} className="absolute inset-0" />
     </div>
   );
 };
