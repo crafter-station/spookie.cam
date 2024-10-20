@@ -3,6 +3,8 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { DitheredImage } from '@/components/dithered-image';
 
+import { getBase64Image } from '@/lib/get-base-64-image';
+
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -25,6 +27,10 @@ export default async function Page() {
     }[];
   };
 
+  const blurDataURLs = await Promise.all(
+    data.resources.map(({ public_id }) => getBase64Image(public_id)),
+  );
+
   return (
     <>
       <CardTitle>Gallery</CardTitle>
@@ -40,6 +46,9 @@ export default async function Page() {
               id={public_id}
               alt={
                 context.caption ? context.caption.replace(/"/g, '') : undefined
+              }
+              blurDataURL={
+                blurDataURLs.find((x) => x.id === public_id)?.dataURL
               }
             />
             {context.caption ? (

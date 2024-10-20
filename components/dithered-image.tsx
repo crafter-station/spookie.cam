@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const sizes = {
@@ -9,62 +10,38 @@ const sizes = {
   lg: 750,
 } as const;
 
+// 1x1 pixel black GIF
+const DEFAULT_BLUR_DATA_URL =
+  'data:image/jpeg;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 export const DitheredImage = ({
   id,
   size,
   alt,
+  blurDataURL,
 }: {
   size?: keyof typeof sizes;
   id: string;
   alt?: string | undefined;
+  blurDataURL?: string | null;
 }) => {
-  const imgRef = useRef<HTMLImageElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
   const selectedSize = size || 'md';
-
-  useEffect(() => {
-    const image = imgRef.current;
-    if (!image) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          image.src = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/multi/v1/dl_150/${id}_frame.gif`;
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        rootMargin: '500px',
-      },
-    );
-
-    observer.observe(image);
-
-    return () => {
-      observer.unobserve(image);
-    };
-  }, [id]);
+  const imageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/multi/v1/dl_150/${id}_frame.gif`;
 
   return (
-    <div
-      className="relative"
-      style={{ width: sizes[selectedSize], height: sizes[selectedSize] }}
-    >
-      <img
-        ref={imgRef}
+    <div className="relative">
+      <Image
         alt={alt || 'a spooky image'}
+        src={imageUrl}
         width={sizes[selectedSize]}
         height={sizes[selectedSize]}
-        onLoad={() => setIsLoaded(true)}
-        style={{
-          opacity: isLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-in-out',
-          objectFit: 'cover',
-          width: '100%',
-          height: '100%',
-        }}
+        className="object-cover"
+        placeholder="blur"
+        blurDataURL={blurDataURL || DEFAULT_BLUR_DATA_URL}
       />
-      <Link href={`/pic/${id}`} className="absolute inset-0" />
+      {size !== 'lg' && (
+        <Link href={`/pic/${id}`} className="absolute inset-0" />
+      )}
     </div>
   );
 };

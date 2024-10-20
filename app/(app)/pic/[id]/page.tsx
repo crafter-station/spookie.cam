@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/tooltip';
 import { DitheredImage } from '@/components/dithered-image';
 
+import { getBase64Image } from '@/lib/get-base-64-image';
 import { vectorIndex } from '@/lib/vector';
 
 import { ImageDownloadButton } from './download-button';
@@ -106,6 +107,25 @@ export default async function Page({ params }: { params: { id: string } }) {
         })
       : null;
 
+  const images = [
+    {
+      id: image.public_id,
+    },
+  ];
+
+  if (similar) {
+    images.push(
+      ...similar.resources.map(({ public_id }) => ({
+        id: public_id,
+      })),
+    );
+  }
+
+  const blurDataURLs = await Promise.all(
+    images.map(({ id }) => getBase64Image(id)),
+  );
+
+  console.log(blurDataURLs);
   return (
     <>
       <CardTitle className="flex items-center space-x-1">
@@ -140,6 +160,9 @@ export default async function Page({ params }: { params: { id: string } }) {
                 ? image.context.custom.caption.replace(/"/g, '')
                 : undefined
             }
+            blurDataURL={
+              blurDataURLs.find((x) => x.id === image.public_id)?.dataURL
+            }
           />
           {image.context?.custom.caption ? (
             <p className="font-mono italic text-muted-foreground">
@@ -171,6 +194,9 @@ export default async function Page({ params }: { params: { id: string } }) {
                         : undefined
                     }
                     size="sm"
+                    blurDataURL={
+                      blurDataURLs.find((x) => x.id === public_id)?.dataURL
+                    }
                   />
                   {context?.custom?.caption ? (
                     <p className="font-mono text-xs italic text-muted-foreground">
