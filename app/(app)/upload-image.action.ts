@@ -114,7 +114,7 @@ export async function uploadImage(formData: FormData): Promise<
 
     try {
       // Generate frames in parallel
-      const framePromises = transformations.map((transformation, index) =>
+      const framePromises = transformations.map((transformation) =>
         cloudinary.uploader.upload(
           `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/v1/${id}`,
           transformation,

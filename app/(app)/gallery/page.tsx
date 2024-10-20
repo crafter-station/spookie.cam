@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const revalidate = 30;
+export const revalidate = 10;
 
 export default async function Page() {
   const data = (await cloudinary.search

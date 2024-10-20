@@ -18,6 +18,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+export const revalidate = 30;
+
 export default async function Page({ params }: { params: { id: string } }) {
   const data = (await cloudinary.api.resources_by_ids(params.id, {
     context: true,
@@ -144,4 +146,21 @@ export default async function Page({ params }: { params: { id: string } }) {
       ) : null}
     </>
   );
+}
+
+export async function generateStaticParams() {
+  const data = (await cloudinary.search
+    .expression('tags=public')
+    .fields('context')
+    .execute()) as {
+    total_count: number;
+    resources: {
+      public_id: string;
+      context: {
+        caption: string | undefined;
+      };
+    }[];
+  };
+
+  return data.resources.map(({ public_id }) => ({ id: public_id }));
 }

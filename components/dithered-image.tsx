@@ -23,15 +23,13 @@ export const DitheredImage = ({
   const selectedSize = size || 'md';
 
   useEffect(() => {
-    if (!imgRef.current) return;
+    const image = imgRef.current;
+    if (!image) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          const img = imgRef.current;
-          if (img) {
-            img.src = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/multi/v1/dl_150/${id}_frame.gif`;
-          }
+          image.src = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/multi/v1/dl_150/${id}_frame.gif`;
           observer.unobserve(entry.target);
         }
       },
@@ -40,12 +38,10 @@ export const DitheredImage = ({
       },
     );
 
-    observer.observe(imgRef.current);
+    observer.observe(image);
 
     return () => {
-      if (imgRef.current) {
-        observer.unobserve(imgRef.current);
-      }
+      observer.unobserve(image);
     };
   }, [id]);
 
