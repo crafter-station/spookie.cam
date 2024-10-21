@@ -1,4 +1,3 @@
-import { v2 as cloudinary } from 'cloudinary';
 import { InfoIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -10,17 +9,12 @@ import {
 } from '@/components/ui/tooltip';
 import { DitheredImage } from '@/components/dithered-image';
 
+import { cloudinary } from '@/lib/cloudinary';
 import { getBase64Image } from '@/lib/get-base-64-image';
 import { vectorIndex } from '@/lib/vector';
 
 import { ImageDownloadButton } from './download-button';
 import { ShareButton } from './share-button';
-
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 export const revalidate = 30;
 
@@ -80,7 +74,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   const similarIds = vector?.vector
     ? await vectorIndex.query({
         vector: vector.vector,
-        topK: 10,
+        topK: 12,
         includeVectors: false,
       })
     : [];
@@ -125,7 +119,6 @@ export default async function Page({ params }: { params: { id: string } }) {
     images.map(({ id }) => getBase64Image(id)),
   );
 
-  console.log(blurDataURLs);
   return (
     <>
       <CardTitle className="flex items-center space-x-1">

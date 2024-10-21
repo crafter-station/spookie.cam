@@ -1,15 +1,26 @@
+import { notFound } from 'next/navigation';
+
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { DitheredImage } from '@/components/dithered-image';
 
-import { getAllImages, getImagesPage } from './getImages';
-import { PAGE_SIZE } from './page-size';
-import { Pagination } from './pagination';
+import { getAllImages, getImagesPage } from '../getImages';
+import { PAGE_SIZE } from '../page-size';
+import { Pagination } from '../pagination';
 
 export const revalidate = 10;
 
-export default async function Page() {
-  const images = await getImagesPage(0);
+export default async function Page({
+  params,
+}: {
+  params: { pageIndex: string };
+}) {
+  const pageIndex = parseInt(params.pageIndex);
+  if (isNaN(pageIndex)) {
+    return notFound();
+  }
+  const images = await getImagesPage(pageIndex);
   const allImages = await getAllImages();
+  const totalPages = Math.ceil(allImages.length / PAGE_SIZE);
 
   return (
     <>
@@ -32,7 +43,15 @@ export default async function Page() {
         ))}
       </div>
 
-      <Pagination totalPages={Math.ceil(allImages.length / PAGE_SIZE)} />
+      <Pagination totalPages={totalPages} />
     </>
   );
 }
+
+export const generateStaticParams = async () => {
+  const allImages = await getAllImages();
+  const totalPages = Math.max(1, Math.ceil(allImages.length / PAGE_SIZE));
+  return Array.from({ length: totalPages }, (_, i) => ({
+    pageIndex: i.toString(),
+  }));
+};
