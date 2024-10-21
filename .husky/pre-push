@@ -1,1 +1,10 @@
+#!/bin/sh
+
+# Check if the INSECURE_SKIP_BUILD environment variable is set
+if [ "$INSECURE_SKIP_BUILD" = "true" ]; then
+    echo "Warning: Skipping build step. This is insecure and should only be used in exceptional circumstances."
+    exit 0
+fi
+
+# If the environment variable is not set, run the build step
 bun run build
