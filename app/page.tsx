@@ -1,12 +1,16 @@
-import SpookyImage from '@/components/spooky-image';
+import FoggyBackground from '@/components/foggy-background';
+import { HorrificImageFilter } from '@/components/horrific-image-filter';
 
 export default function Home() {
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="mb-6 text-center text-3xl font-bold">
-        Welcome to spookie.cam
-      </h1>
-      <SpookyImage />
-    </div>
+    <>
+      <FoggyBackground />
+      <div className="container mx-auto py-8">
+        <h1 className="mb-6 text-center text-3xl font-bold">
+          Welcome to spookie.cam
+        </h1>
+        <HorrificImageFilter />
+      </div>
+    </>
   );
 }
