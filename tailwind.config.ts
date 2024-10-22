@@ -11,6 +11,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)'],
+        vcr: ['var(--font-vcr-osd-mono)'],
       },
       colors: {
         background: 'hsl(var(--background))',

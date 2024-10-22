@@ -16,6 +16,11 @@ const geistMono = localFont({
   variable: '--font-geist-mono',
   weight: '100 900',
 });
+const vcrOsdMono = localFont({
+  src: './fonts/VCR_OSD_MONO_1.001.ttf',
+  variable: '--font-vcr-osd-mono',
+  weight: '400',
+});
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -27,10 +32,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log({ vre: vcrOsdMono.variable });
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${vcrOsdMono.variable} dark antialiased`}
       >
         <Providers>{children}</Providers>
       </body>
