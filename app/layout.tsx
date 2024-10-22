@@ -32,7 +32,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log({ vre: vcrOsdMono.variable });
   return (
     <html lang="en" suppressHydrationWarning>
       <body
