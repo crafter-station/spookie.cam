@@ -107,7 +107,18 @@ const VHSEffect = () => {
   );
 };
 
-const Scene = ({ settings, glitchActive }) => {
+interface SceneProps {
+  settings: {
+    glitchIntensity: number;
+    noiseOpacity: number;
+    vignetteIntensity: number;
+    bloomIntensity: number;
+    dofFocusDistance: number;
+  };
+  glitchActive: boolean;
+}
+
+const Scene: React.FC<SceneProps> = ({ settings, glitchActive }) => {
   return (
     <>
       <VHSEffect />
