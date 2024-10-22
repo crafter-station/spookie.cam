@@ -67,7 +67,7 @@ export async function uploadImage(formData: FormData): Promise<
             context: caption
               ? `caption="${caption}"|user_id="${userId}"`
               : `user_id="${userId}"`,
-            moderation: 'aws_rek',
+            // moderation: 'aws_rek',
             resource_type: 'image',
             transformation: [
               { width: 1000, height: 1000, crop: 'limit' },
@@ -79,8 +79,8 @@ export async function uploadImage(formData: FormData): Promise<
             if (error) reject(error);
             if (
               result &&
-              (result.moderation[0] as unknown as { status: string }).status ===
-                'rejected'
+              (result.moderation?.[0] as unknown as { status: string })
+                ?.status === 'rejected'
             )
               reject(
                 new Error(
