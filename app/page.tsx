@@ -5,7 +5,6 @@ import { CircleIcon, PlayIcon } from 'lucide-react';
 import { SpookyButton } from '@/components/ui/icons';
 
 import { CDate } from './c-date';
-import PlayScream from './play-scream';
 
 export default function Home() {
   return (
@@ -23,29 +22,26 @@ export default function Home() {
           />
         </div>
         <CDate />
-        <h1 className="mb-6 text-center text-3xl font-bold">
+        <h1 className="z-50 mb-6 text-center text-3xl font-bold md:text-4xl">
           Welcome to{' '}
-          <span className="block text-8xl text-red-900">spookie.cam</span>
+          <span className="block text-6xl text-red-900 md:text-8xl">
+            spookie.cam
+          </span>
         </h1>
-        <p className="text-center text-xl">
+        <p className="text-balance text-center md:text-xl">
           You are about to enter a world of horror and terror. Are you ready?
         </p>
 
-        <Link
-          href="/catalog"
-          className="group relative my-8"
-          id="continue-button"
-        >
+        <Link href="/catalog" className="group relative my-8">
           <SpookyButton className="w-[20rem] text-red-900 drop-shadow-lg group-hover:text-white group-focus:text-white group-focus:outline-none group-focus:ring-0" />
           <span className="absolute inset-0 flex items-center justify-center pb-2 text-3xl font-black group-hover:text-red-900 group-focus:text-red-900">
             Continue
           </span>
         </Link>
 
-        <p className="mt-64 text-center text-xl text-muted-foreground">
+        <p className="mt-64 text-balance text-center text-muted-foreground md:text-xl">
           Images may be disturbing. Viewer discretion is advised.
         </p>
-        <PlayScream />
       </div>
     </>
   );

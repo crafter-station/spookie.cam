@@ -122,10 +122,21 @@ export const MemeGenerator = ({ id }: MemeGeneratorProps) => {
     <Dialog
       open={isDialogOpen}
       onOpenChange={(val) => {
-        const backgroundNoiseSoundButton = document.getElementById(
-          'background-noise-button',
-        );
-        backgroundNoiseSoundButton?.click();
+        const backgroundNoiseAudio = document.getElementById(
+          'background-noise-audio',
+        ) as HTMLAudioElement;
+
+        if (val) {
+          if (backgroundNoiseAudio) {
+            if (backgroundNoiseAudio.currentTime > 0) {
+              backgroundNoiseAudio.pause();
+            }
+          }
+        } else {
+          if (backgroundNoiseAudio.currentTime > 0) {
+            backgroundNoiseAudio.play();
+          }
+        }
         setIsDialogOpen(val);
       }}
     >
