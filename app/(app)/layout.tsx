@@ -12,7 +12,7 @@ import { NewPic } from './new-pic';
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-[150vh]">
+    <div className="min-h-screen">
       <nav className="sticky top-0 z-50 mx-auto flex h-16 max-w-6xl items-center justify-between bg-transparent px-4 md:px-8">
         <NavbarShader />
         <div className="font-vcr text-2xl font-black">spookie.cam</div>

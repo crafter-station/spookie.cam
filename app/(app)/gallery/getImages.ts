@@ -22,7 +22,6 @@ export const getAllImages = cache(async () => {
       };
     }[];
   };
-
   return data.resources || [];
 });
 

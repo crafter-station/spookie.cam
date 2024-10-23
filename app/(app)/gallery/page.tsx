@@ -1,5 +1,6 @@
 import { DitheredImage } from '@/components/dithered-image';
 import FoggyBackground from '@/components/foggy-background';
+import { HorrificImageFilter } from '@/components/horrific-image-filter';
 
 import { getAllImages, getImagesPage } from './getImages';
 import { PAGE_SIZE } from './page-size';
@@ -15,6 +16,7 @@ export default async function Page() {
     <>
       <FoggyBackground />
       <div className="relative z-10 min-h-screen bg-transparent p-8 text-orange-500">
+        <HorrificImageFilter />
         <div className="grid grid-cols-1 gap-16">
           {images.map(({ id, caption, blurDataURL }) => (
             <div

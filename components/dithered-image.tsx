@@ -19,14 +19,20 @@ export const DitheredImage = ({
   size,
   alt,
   blurDataURL,
+  useOriginal = true,
 }: {
   size?: keyof typeof sizes;
   id: string;
   alt?: string | undefined;
   blurDataURL?: string | null;
+  useOriginal?: boolean;
 }) => {
   const selectedSize = size || 'md';
-  const imageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/multi/v1/dl_150/${id}_frame.gif`;
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+  const imageUrl = useOriginal
+    ? `https://res.cloudinary.com/${cloudName}/image/upload/${id}`
+    : `https://res.cloudinary.com/${cloudName}/image/multi/v1/dl_150/${id}_frame.gif`;
 
   return (
     <div className="relative">

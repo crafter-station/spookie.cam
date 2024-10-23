@@ -412,7 +412,7 @@ function createShader(effectCode: string) {
   };
 }
 
-function HorrificEffect({
+export function HorrificEffect({
   texture,
   effectIndex,
 }: {
