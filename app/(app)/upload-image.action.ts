@@ -2,6 +2,7 @@
 
 import { headers } from 'next/headers';
 
+import { sql } from '@vercel/postgres';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { z } from 'zod';
 
@@ -67,20 +68,18 @@ export async function uploadImage(formData: FormData): Promise<
             context: caption
               ? `caption="${caption}"|user_id="${userId}"`
               : `user_id="${userId}"`,
-            moderation: 'aws_rek',
             resource_type: 'image',
             transformation: [
               { width: 1000, height: 1000, crop: 'limit' },
               { quality: 'auto:good', fetch_format: 'auto' },
             ],
-            // background_removal: "cloudinary_ai"
           },
           (error, result) => {
             if (error) reject(error);
             if (
               result &&
-              (result.moderation[0] as unknown as { status: string }).status ===
-                'rejected'
+              (result.moderation?.[0] as unknown as { status: string })
+                ?.status === 'rejected'
             )
               reject(
                 new Error(
@@ -130,6 +129,44 @@ export async function uploadImage(formData: FormData): Promise<
     } catch (error) {
       console.error('Error:', error);
       throw new Error('Error generating GIF');
+    }
+
+    // Save image details to the database
+    // Save image details to the database
+    try {
+      await sql`
+    INSERT INTO creatures (
+      cloudinary_public_id,
+      name,
+      synopsis,
+      location,
+      time,
+      weather,
+      effect_index,
+      created_at,
+      is_public,
+      caption
+    ) VALUES (
+      ${id},
+      ${null},
+      ${null},
+      ${null},
+      ${null},
+      ${null},
+      ${Math.floor(Math.random() * 6)},
+      NOW(),
+      ${isPublic},
+      ${caption}
+    )
+    ON CONFLICT (cloudinary_public_id) 
+    DO UPDATE SET
+      is_public = EXCLUDED.is_public,
+      caption = EXCLUDED.caption,
+      updated_at = NOW();
+  `;
+    } catch (error) {
+      console.error('Database error:', error);
+      throw new Error('Error saving image details');
     }
 
     const inputEmbeddings: EmbeddingInput[] = [{ image: url }];

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { GalleryVerticalIcon, UserIcon } from 'lucide-react';
 
 import { buttonVariants } from '@/components/ui/button';
+import { NavbarShader } from '@/components/nav-bar-shader';
 
 import { cn } from '@/lib/utils';
 
@@ -11,9 +12,10 @@ import { NewPic } from './new-pic';
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-[150vh]">
-      <nav className="sticky top-0 z-10 mx-auto flex h-16 max-w-6xl items-center justify-between bg-background px-4 md:px-8">
-        <div className="font-black">spookie.cam</div>
+    <div className="min-h-screen">
+      <nav className="sticky top-0 z-50 mx-auto flex h-16 max-w-6xl items-center justify-between bg-transparent px-4 md:px-8">
+        <NavbarShader />
+        <div className="font-vcr text-2xl font-black">spookie.cam</div>
 
         <div className="flex space-x-2">
           <NewPic />

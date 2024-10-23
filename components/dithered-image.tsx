@@ -19,16 +19,18 @@ export const DitheredImage = ({
   size,
   alt,
   blurDataURL,
+  useOriginal = true,
 }: {
   size?: keyof typeof sizes;
   id: string;
   alt?: string | undefined;
   blurDataURL?: string | null;
+  useOriginal?: boolean;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const selectedSize = size || 'md';
-  const imageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${id}.jpg`;
 
+  const imageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${id}.jpg`;
   const hoverImageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/multi/v1/dl_150/${id}_frame.gif`;
 
   return (
