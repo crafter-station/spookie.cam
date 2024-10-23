@@ -4,8 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useDuration } from '@/hooks/use-duration';
 import { DialogDescription } from '@radix-ui/react-dialog';
+import { Canvas } from '@react-three/fiber';
 import { InfoIcon, PlusIcon } from 'lucide-react';
+import * as THREE from 'three';
 
+import { HorrificEffect } from './horrific-image-filter';
 import { ProgressBarGroup } from './progress-bar-group';
 import { Button } from './ui/button';
 import {
@@ -50,9 +53,9 @@ const options = [
 const imageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 
 export const MemeGenerator = ({ id }: MemeGeneratorProps) => {
+  const [textures, setTextures] = useState<THREE.Texture[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [images, setImages] = useState<string[]>([]);
 
   const durations = useDuration({ customDurations, audios });
 
@@ -75,28 +78,44 @@ export const MemeGenerator = ({ id }: MemeGeneratorProps) => {
 
   const slideComponents = useMemo(
     () =>
-      durations.map((_, index) => (
-        <img
-          key={index}
-          src={images[index]}
-          alt="img"
-          className="aspect-square h-full w-full object-cover"
-        />
-      )),
-    [durations, images],
+      durations.map(
+        (_, index) =>
+          textures.length > 0 && (
+            <div
+              key={index}
+              className="aspect-square w-full overflow-hidden rounded-sm bg-[#0a0a0a] shadow-[0_0_15px_rgba(255,0,0,0.3)] transition-all duration-300 ease-in-out hover:shadow-[0_0_25px_rgba(255,0,0,0.5)]"
+            >
+              {index === 0 ? (
+                <img
+                  src={`${imageUrl}/${id}.jpg`}
+                  alt="img"
+                  className="aspect-square h-full w-full object-cover"
+                />
+              ) : (
+                <Canvas
+                  orthographic
+                  camera={{ zoom: 1, position: [0, 0, 100] }}
+                >
+                  <HorrificEffect
+                    texture={textures[index]}
+                    effectIndex={index}
+                  />
+                </Canvas>
+              )}
+            </div>
+          ),
+      ),
+    [durations, textures, id],
   );
 
   useEffect(() => {
-    const loadedImages: string[] = options.map(
-      (option) => `${imageUrl}/${option}/${id}.jpg`,
-    );
-
-    loadedImages.forEach((src) => {
-      const img = new Image();
-      img.src = src;
+    options.forEach((option) => {
+      const image = `${imageUrl}/${option}/${id}.jpg`;
+      const loader = new THREE.TextureLoader();
+      loader.load(image, (loadedTexture) => {
+        setTextures((prev) => [...prev, loadedTexture]);
+      });
     });
-
-    setImages(loadedImages);
   }, [id]);
 
   return (
@@ -121,18 +140,15 @@ export const MemeGenerator = ({ id }: MemeGeneratorProps) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex gap-1">
-                <p>Instructions</p>
+                Instructions
                 <Button size="icon" variant="ghost" className="size-5">
                   <InfoIcon className="size-3" />
                 </Button>
               </div>
             </TooltipTrigger>
-            <TooltipContent>
-              <ul>
-                <li>Press J or L to navigate between slides.</li>
-                <li>Press M to toggle mute.</li>
-                <li>Press K to play/pause.</li>
-              </ul>
+            <TooltipContent className="w-[180px]">
+              Press J or L to navigate between slides. Press M to toggle mute.
+              Press K to play/pause.
             </TooltipContent>
           </Tooltip>
         </DialogDescription>

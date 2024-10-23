@@ -8,8 +8,11 @@ import { readStreamableValue } from 'ai/rsc';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ImageDownloadButton } from '@/components/download-button';
+import { ShareButton } from '@/components/share-button';
 
 import { HorrificCreatureCard } from './horrific-creature-card';
+import { MemeGenerator } from './meme-generator';
 
 type Creature = {
   id: number;
@@ -137,6 +140,15 @@ export function CreatureDetails({ creature }: { creature: Creature }) {
                 </Card>
               ))}
             </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="mt-8 border-red-900">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-3 gap-8">
+            <ImageDownloadButton id={creature.cloudinary_public_id} />
+            <ShareButton id={creature.cloudinary_public_id} />
+            <MemeGenerator id={creature.cloudinary_public_id} />
           </div>
         </CardContent>
       </Card>

@@ -100,7 +100,7 @@ export const ProgressBarGroup = ({
   if (durations.length === 0) {
     return (
       <div
-        className="flex h-full items-center justify-center"
+        className="flex aspect-square h-full items-center justify-center"
         aria-live="polite"
       >
         <Loader2 className="mr-2 size-4 animate-spin" />
