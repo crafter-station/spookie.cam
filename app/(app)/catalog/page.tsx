@@ -1,0 +1,25 @@
+import FoggyBackground from '@/components/foggy-background';
+import { HorrificCreatureCard } from '@/components/horrific-creature-card';
+
+import { getAllCreatures } from '@/lib/db';
+
+export default async function Home() {
+  const creatures = await getAllCreatures();
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <FoggyBackground />
+      <h1 className="mb-8 text-center text-4xl font-bold">Creepy Creatures</h1>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {creatures.map((creature) => (
+          <HorrificCreatureCard
+            key={creature.id}
+            name={creature.name}
+            cloudinaryPublicId={creature.cloudinary_public_id}
+            effectIndex={creature.effect_index}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
