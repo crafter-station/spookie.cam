@@ -1,20 +1,43 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export default function PlayScream() {
-  const [audio] = useState(new Audio('/audios/scream.mp3'));
+interface AudioElementRef {
+  current: HTMLAudioElement | null;
+}
 
-  useEffect(() => {
-    const continueButton = document.getElementById('continue-button');
+interface AudioPlayError extends Error {
+  name: string;
+  message: string;
+  code?: number;
+}
 
-    const handleClick = () => {
-      audio.currentTime = 0; // Reset audio to start
-      audio.play().catch((error) => {
-        console.error('Error playing audio:', error);
-      });
+export default function PlayScream(): null {
+  const audioRef: AudioElementRef = useRef<HTMLAudioElement | null>(null);
+  const [isClient, setIsClient] = useState<boolean>(false);
+
+  useEffect((): void => {
+    setIsClient(true);
+    // Create Audio instance only on client side
+    audioRef.current = new Audio('/audios/scream.mp3');
+  }, []);
+
+  useEffect((): (() => void) => {
+    if (!isClient) return () => {};
+
+    const handleClick = async (): Promise<void> => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        try {
+          await audioRef.current.play();
+        } catch (error) {
+          console.error('Error playing audio:', error as AudioPlayError);
+        }
+      }
     };
 
+    const continueButton: HTMLElement | null =
+      document.getElementById('continue-button');
     if (continueButton) {
       continueButton.addEventListener('click', handleClick);
     }
@@ -24,8 +47,13 @@ export default function PlayScream() {
       if (continueButton) {
         continueButton.removeEventListener('click', handleClick);
       }
+      // Cleanup audio instance
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
-  }, [audio]); // Empty dependency array since we only want this to run once
+  }, [isClient]);
 
   return null;
 }

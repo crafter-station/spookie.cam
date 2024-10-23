@@ -10,87 +10,100 @@ const BACKGROUND_NOISE_AUDIO_URLS = [
   '/audios/horror-ambience.mp3',
   '/audios/whispers.mp3',
   '/audios/terror.mp3',
-];
+] as const;
 
-const LOCAL_STORAGE_KEY = 'background-audio-preference';
-const AUTOPLAY_DELAY = 2000; // 5 seconds in milliseconds
+const LOCAL_STORAGE_KEY = 'background-audio-preference' as const;
+const AUTOPLAY_DELAY = 2000 as const; // 2 seconds in milliseconds
 
-export const BackgroundNoiseAudioPlayButton = () => {
-  const [isPlaying, setIsPlaying] = useState(() => {
-    // Initialize state from localStorage if available
-    if (typeof window !== 'undefined') {
-      const savedPreference = localStorage.getItem(LOCAL_STORAGE_KEY);
-      return savedPreference ? JSON.parse(savedPreference) : false;
-    }
-    return false;
-  });
-
-  const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
-  const audioRef = useRef(new Audio(BACKGROUND_NOISE_AUDIO_URLS[0]));
+export const BackgroundNoiseAudioPlayButton = (): JSX.Element => {
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const autoplayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Initialize audio and state when component mounts in browser
   useEffect(() => {
-    const audio = audioRef.current;
+    // Initialize audio instance
+    audioRef.current = new Audio(BACKGROUND_NOISE_AUDIO_URLS[0]);
 
-    const handleAudioEnd = () => {
-      setCurrentAudioIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % BACKGROUND_NOISE_AUDIO_URLS.length;
-        audio.src = BACKGROUND_NOISE_AUDIO_URLS[nextIndex];
-        audio
-          .play()
-          .catch((error) => console.error('Error playing audio:', error));
-        return nextIndex;
-      });
-    };
-
-    audio.addEventListener('ended', handleAudioEnd);
+    // Initialize state from localStorage if available
+    const savedPreference = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedPreference) {
+      setIsPlaying(JSON.parse(savedPreference) as boolean);
+    }
 
     // Set up autoplay timer
     autoplayTimeoutRef.current = setTimeout(() => {
-      const savedPreference = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const savedPref = localStorage.getItem(LOCAL_STORAGE_KEY);
       // Only autoplay if user hasn't explicitly set a preference
-      if (!savedPreference) {
+      if (!savedPref && audioRef.current) {
         setIsPlaying(true);
-        audio.src = BACKGROUND_NOISE_AUDIO_URLS[currentAudioIndex];
-        audio
+        audioRef.current.src = BACKGROUND_NOISE_AUDIO_URLS[currentAudioIndex];
+        audioRef.current
           .play()
-          .catch((error) => console.error('Error playing audio:', error));
+          .catch((error: Error) =>
+            console.error('Error playing audio:', error),
+          );
       }
     }, AUTOPLAY_DELAY);
 
     return () => {
-      audio.removeEventListener('ended', handleAudioEnd);
-      audio.pause();
-      audio.currentTime = 0;
       if (autoplayTimeoutRef.current) {
         clearTimeout(autoplayTimeoutRef.current);
       }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
-  }, [currentAudioIndex]);
+  }, [currentAudioIndex]); // Empty dependency array as this should only run once on mount
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const handleAudioEnd = () => {
+      setCurrentAudioIndex((prevIndex: number) => {
+        const nextIndex = (prevIndex + 1) % BACKGROUND_NOISE_AUDIO_URLS.length;
+        if (audioRef.current) {
+          audioRef.current.src = BACKGROUND_NOISE_AUDIO_URLS[nextIndex];
+          audioRef.current
+            .play()
+            .catch((error: Error) =>
+              console.error('Error playing audio:', error),
+            );
+        }
+        return nextIndex;
+      });
+    };
+
+    audioRef.current.addEventListener('ended', handleAudioEnd);
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('ended', handleAudioEnd);
+      }
+    };
+  }, []);
 
   // Effect to handle playing/pausing and saving preference
   useEffect(() => {
-    const audio = audioRef.current;
+    if (!audioRef.current) return;
 
     if (isPlaying) {
-      audio.src = BACKGROUND_NOISE_AUDIO_URLS[currentAudioIndex];
-      audio
+      audioRef.current.src = BACKGROUND_NOISE_AUDIO_URLS[currentAudioIndex];
+      audioRef.current
         .play()
-        .catch((error) => console.error('Error playing audio:', error));
+        .catch((error: Error) => console.error('Error playing audio:', error));
     } else {
-      audio.pause();
-      audio.currentTime = 0;
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
 
-    // Save preference to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(isPlaying));
-    }
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(isPlaying));
   }, [isPlaying, currentAudioIndex]);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = (): void => {
     setIsPlaying(!isPlaying);
-    // Clear autoplay timeout when user manually interacts
     if (autoplayTimeoutRef.current) {
       clearTimeout(autoplayTimeoutRef.current);
     }
