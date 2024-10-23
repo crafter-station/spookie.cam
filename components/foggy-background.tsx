@@ -86,25 +86,8 @@ const VHSShader = {
 };
 
 const VHSEffect = () => {
-  const { gl } = useThree();
-  const shaderRef = useRef<THREE.ShaderMaterial>(null);
-
-  useEffect(() => {
-    if (shaderRef.current) {
-      const renderTarget = new THREE.WebGLRenderTarget(
-        gl.domElement.width,
-        gl.domElement.height,
-        {
-          minFilter: THREE.LinearFilter,
-          magFilter: THREE.LinearFilter,
-          format: THREE.RGBAFormat,
-          stencilBuffer: false,
-          depthBuffer: true,
-        },
-      );
-      shaderRef.current.uniforms.tDiffuse.value = renderTarget.texture;
-    }
-  }, [gl]);
+  const { viewport } = useThree();
+  const shaderRef = useRef<THREE.ShaderMaterial | null>(null);
 
   useFrame((_, delta) => {
     if (shaderRef.current) {
@@ -113,13 +96,12 @@ const VHSEffect = () => {
   });
 
   return (
-    <mesh>
-      <planeGeometry args={[2, 2]} />
+    <mesh scale={[viewport.width, viewport.height, 1]}>
+      <planeGeometry />
       <shaderMaterial
         ref={shaderRef}
         args={[VHSShader]}
         uniforms-tDiffuse-value={null}
-        transparent
       />
     </mesh>
   );
@@ -137,32 +119,23 @@ interface SceneProps {
 }
 
 const Scene: React.FC<SceneProps> = ({ settings, glitchActive }) => {
-  const { gl } = useThree();
-
-  useEffect(() => {
-    // Configure renderer
-    gl.outputEncoding = THREE.sRGBEncoding;
-    gl.toneMapping = THREE.ACESFilmicToneMapping;
-  }, [gl]);
-
   return (
     <>
       <VHSEffect />
       <EffectComposer>
-        {glitchActive && (
-          <Glitch
-            delay={new Vector2(0.5, 1)}
-            duration={new Vector2(0.1, 0.3)}
-            strength={
-              new Vector2(
-                settings.glitchIntensity * 0.5,
-                settings.glitchIntensity,
-              )
-            }
-            mode={GlitchMode.CONSTANT_WILD}
-            ratio={0.85}
-          />
-        )}
+        <Glitch
+          delay={new Vector2(0.5, 1)}
+          duration={new Vector2(0.1, 0.3)}
+          strength={
+            new Vector2(
+              settings.glitchIntensity * 0.5,
+              settings.glitchIntensity,
+            )
+          }
+          mode={GlitchMode.CONSTANT_WILD}
+          active={glitchActive}
+          ratio={0.85}
+        />
         <Noise
           premultiply
           blendFunction={BlendFunction.OVERLAY}
@@ -192,14 +165,9 @@ const Scene: React.FC<SceneProps> = ({ settings, glitchActive }) => {
 
 const FoggyBackground = () => {
   const [isMounted, setIsMounted] = useState(false);
-  const glitchTimeoutRef = useRef<NodeJS.Timeout>();
-  const messageTimeoutRef = useRef<NodeJS.Timeout>();
-  const glitchIntervalRef = useRef<NodeJS.Timeout>();
-  const messageIntervalRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     setIsMounted(true);
-    return () => setIsMounted(false);
   }, []);
 
   const [settings] = useState({
@@ -214,30 +182,20 @@ const FoggyBackground = () => {
   });
 
   const [glitchActive, setGlitchActive] = useState(false);
-  const [spookyMessage, setSpookyMessage] = useState('');
 
   useEffect(() => {
-    const triggerGlitch = () => {
-      setGlitchActive(true);
-      glitchTimeoutRef.current = setTimeout(
-        () => {
-          setGlitchActive(false);
-        },
-        50 + Math.random() * 150,
-      );
-    };
-
-    glitchIntervalRef.current = setInterval(
-      triggerGlitch,
+    const glitchInterval = setInterval(
+      () => {
+        setGlitchActive(true);
+        setTimeout(() => setGlitchActive(false), 50 + Math.random() * 150);
+      },
       1000 + Math.random() * 2000,
     );
 
-    return () => {
-      if (glitchTimeoutRef.current) clearTimeout(glitchTimeoutRef.current);
-      if (glitchIntervalRef.current) clearInterval(glitchIntervalRef.current);
-    };
+    return () => clearInterval(glitchInterval);
   }, []);
 
+  const [spookyMessage, setSpookyMessage] = useState('');
   useEffect(() => {
     const messages = [
       "They're here",
@@ -246,22 +204,16 @@ const FoggyBackground = () => {
       "It's watching you",
       'Run.',
     ];
-
     const showMessage = () => {
       const message = messages[Math.floor(Math.random() * messages.length)];
       setSpookyMessage(message);
-      messageTimeoutRef.current = setTimeout(() => setSpookyMessage(''), 2000);
+      setTimeout(() => setSpookyMessage(''), 2000);
     };
-
-    messageIntervalRef.current = setInterval(
+    const messageInterval = setInterval(
       showMessage,
       10000 + Math.random() * 20000,
     );
-
-    return () => {
-      if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current);
-      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
-    };
+    return () => clearInterval(messageInterval);
   }, []);
 
   if (!isMounted) {
@@ -271,16 +223,7 @@ const FoggyBackground = () => {
   return (
     <>
       <div className="fixed inset-0 z-[-1] h-full w-full">
-        <Canvas
-          camera={{ position: [0, 0, 1] }}
-          className="h-full w-full"
-          gl={{
-            antialias: true,
-            alpha: true,
-            preserveDrawingBuffer: true,
-            stencil: false,
-          }}
-        >
+        <Canvas camera={{ position: [0, 0, 1] }} className="h-full w-full">
           <color attach="background" args={['#000000']} />
           <Scene settings={settings} glitchActive={glitchActive} />
         </Canvas>
