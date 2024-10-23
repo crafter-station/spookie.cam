@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { DitheredImage } from '@/components/dithered-image';
+import { MemeGenerator } from '@/components/meme-generator';
 
 import { getBase64Image } from '@/lib/get-base-64-image';
 import { vectorIndex } from '@/lib/vector';
@@ -169,9 +170,10 @@ export default async function Page({ params }: { params: { id: string } }) {
               {image.context.custom?.caption.replace(/"/g, '')}
             </p>
           ) : null}
-          <div className="flex justify-between space-x-4">
+          <div className="flex flex-wrap justify-evenly gap-4">
             <ImageDownloadButton id={image.public_id} />
             <ShareButton id={image.public_id} />
+            <MemeGenerator id={image.public_id} />
           </div>
         </div>
       </div>

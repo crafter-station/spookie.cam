@@ -28,7 +28,7 @@ export const ImageDownloadButton = ({ id }: { id: string }) => {
   return (
     <Button onClick={handleDownload} variant="outline">
       <DownloadIcon className="mr-2 size-4" />
-      Download
+      Download Gif
     </Button>
   );
 };
