@@ -44,7 +44,6 @@ export function CreatureDetails({ creature }: { creature: Creature }) {
     }
 
     const initialPrompt = `Create a spooky creature based on this image for our Halloween-themed catalog. ${creature.caption ? 'Caption: ' + creature.caption : ''} `;
-    console.log({ initialPrompt });
 
     try {
       const { object } = await generateCreatureDetails(

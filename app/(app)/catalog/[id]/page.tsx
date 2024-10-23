@@ -22,7 +22,7 @@ export default async function CreaturePage({
   return (
     <div className="container mx-auto px-4 py-8">
       <Suspense fallback={<div>Loading creature details...</div>}>
-        <CreatureDetails creature={creatureData} />
+        <CreatureDetails creature={creatureData as any} />
       </Suspense>
     </div>
   );

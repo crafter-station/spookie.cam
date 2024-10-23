@@ -22,8 +22,6 @@ export const getAllImages = cache(async () => {
       };
     }[];
   };
-  console.log({ data });
-
   return data.resources || [];
 });
 
@@ -39,7 +37,6 @@ export const getImagesPage = cache(async (pageIndex: number) => {
     resources.map(({ public_id }) => getBase64Image(public_id)),
   );
 
-  console.log({ resources });
   return resources.map((resource) => ({
     id: resource.public_id,
     caption: resource.context.caption?.replace(/"/g, ''),
