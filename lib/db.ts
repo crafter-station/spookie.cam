@@ -1,4 +1,8 @@
+import { cache } from 'react';
+
 import { sql } from '@vercel/postgres';
+
+import { PAGE_SIZE } from './constants';
 
 export async function getCreature(cloudinaryPublicId: string) {
   const { rows } = await sql`
@@ -30,10 +34,11 @@ export async function getCreature(cloudinaryPublicId: string) {
   return rows[0];
 }
 
-export async function getAllCreatures() {
+export const getCreaturesPage = cache(async (page: number) => {
+  const offset = Math.max(0, (page - 1) * PAGE_SIZE);
+
   const { rows } = await sql`
-    SELECT 
-      c.id, 
+    SELECT c.id, 
       c.cloudinary_public_id, 
       c.name, 
       c.synopsis, 
@@ -41,7 +46,29 @@ export async function getAllCreatures() {
       c.caption,
       c.time,
       c.weather,
-      c.effect_index
+      c.effect_index 
+    FROM 
+      creatures c 
+    ORDER BY 
+      c.created_at DESC 
+    LIMIT ${PAGE_SIZE} 
+    OFFSET ${offset};
+  `;
+  return rows;
+});
+
+export const getTotalPages = cache(async () => {
+  const { rows } = await sql`
+    SELECT COUNT(*) FROM creatures;
+  `;
+  return Math.ceil(rows[0].count / PAGE_SIZE);
+});
+
+export async function getAllCreatures() {
+  const { rows } = await sql`
+    SELECT 
+      c.cloudinary_public_id,
+      c.created_at
     FROM 
       creatures c
     ORDER BY 

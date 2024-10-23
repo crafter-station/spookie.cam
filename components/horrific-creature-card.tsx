@@ -67,7 +67,7 @@ export const HorrificCreatureCard: React.FC<HorrificCreatureCardProps> = ({
   );
 
   return isLink ? (
-    <Link href={`/catalog/${cloudinaryPublicId}`} className="group block">
+    <Link href={`/pic/${cloudinaryPublicId}`} className="group block">
       {content}
     </Link>
   ) : (

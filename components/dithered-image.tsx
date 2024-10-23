@@ -19,13 +19,11 @@ export const DitheredImage = ({
   size,
   alt,
   blurDataURL,
-  useOriginal = true,
 }: {
   size?: keyof typeof sizes;
   id: string;
   alt?: string | undefined;
   blurDataURL?: string | null;
-  useOriginal?: boolean;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const selectedSize = size || 'md';

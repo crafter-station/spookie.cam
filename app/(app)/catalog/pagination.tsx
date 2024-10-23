@@ -12,13 +12,13 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 export const Pagination = ({ totalPages }: { totalPages: number }) => {
-  const MAX_PAGE_INDEX = totalPages - 1;
+  const MAX_PAGE_INDEX = totalPages;
   const { pageIndex } = useParams<{ pageIndex: string }>();
 
   const router = useRouter();
 
   const currentPage = React.useMemo(
-    () => parseInt(pageIndex) || 0,
+    () => parseInt(pageIndex) || 1,
     [pageIndex],
   );
 
@@ -28,9 +28,9 @@ export const Pagination = ({ totalPages }: { totalPages: number }) => {
         Page {currentPage} of {MAX_PAGE_INDEX}
       </p>
 
-      {currentPage <= 0 ? null : (
+      {currentPage <= 1 ? null : (
         <Link
-          href={`/gallery/${currentPage - 1}`}
+          href={`/catalog/${currentPage - 1}`}
           className={cn(buttonVariants({ variant: 'outline', size: 'icon' }))}
         >
           <ChevronLeftIcon className="size-4" />
@@ -38,7 +38,7 @@ export const Pagination = ({ totalPages }: { totalPages: number }) => {
       )}
       {currentPage >= MAX_PAGE_INDEX ? null : (
         <Link
-          href={`/gallery/${currentPage + 1}`}
+          href={`/catalog/${currentPage + 1}`}
           className={cn(buttonVariants({ variant: 'outline', size: 'icon' }))}
         >
           <ChevronRightIcon className="size-4" />
@@ -51,8 +51,8 @@ export const Pagination = ({ totalPages }: { totalPages: number }) => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
           const goTo = parseInt(formData.get('go-to')?.toString() || '');
-          if (!isNaN(goTo) && goTo >= 0 && goTo <= MAX_PAGE_INDEX) {
-            router.push(`/gallery/${goTo}`);
+          if (!isNaN(goTo) && goTo >= 1 && goTo <= MAX_PAGE_INDEX) {
+            router.push(`/catalog/${goTo}`);
           }
         }}
       >
@@ -61,7 +61,7 @@ export const Pagination = ({ totalPages }: { totalPages: number }) => {
           name="go-to"
           required
           placeholder={MAX_PAGE_INDEX.toString()}
-          min={0}
+          min={1}
           max={MAX_PAGE_INDEX}
         />
       </form>

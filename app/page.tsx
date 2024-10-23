@@ -32,7 +32,7 @@ export default function Home() {
           You are about to enter a world of horror and terror. Are you ready?
         </p>
 
-        <Link href="/gallery" className="group relative my-8">
+        <Link href="/catalog" className="group relative my-8">
           <SpookyButton className="w-[20rem] text-red-500 drop-shadow-lg group-hover:text-white group-focus:text-white group-focus:outline-none group-focus:ring-0" />
           <span className="absolute inset-0 flex items-center justify-center pb-2 text-3xl font-black group-hover:text-red-500 group-focus:text-red-500">
             Continue

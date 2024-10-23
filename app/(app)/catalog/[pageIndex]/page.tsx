@@ -1,14 +1,24 @@
+import { notFound } from 'next/navigation';
+
 import FoggyBackground from '@/components/foggy-background';
 import { HorrificCreatureCard } from '@/components/horrific-creature-card';
 
 import { getCreaturesPage, getTotalPages } from '@/lib/db';
 
-import { Pagination } from './pagination';
+import { Pagination } from '../pagination';
 
 export const revalidate = 10;
 
-export default async function Home() {
-  const creatures = await getCreaturesPage(0);
+export default async function Page({
+  params,
+}: {
+  params: { pageIndex: string };
+}) {
+  const pageIndex = parseInt(params.pageIndex);
+  if (isNaN(pageIndex)) {
+    return notFound();
+  }
+  const creatures = await getCreaturesPage(pageIndex);
   const totalPages = await getTotalPages();
 
   return (
@@ -29,3 +39,11 @@ export default async function Home() {
     </div>
   );
 }
+
+export const generateStaticParams = async () => {
+  const totalPages = await getTotalPages();
+
+  return Array.from({ length: totalPages }, (_, i) => ({
+    pageIndex: i.toString(),
+  }));
+};

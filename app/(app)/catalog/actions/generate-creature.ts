@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
 import { openai } from '@ai-sdk/openai';
 import { streamObject } from 'ai';
 import { createStreamableValue } from 'ai/rsc';
@@ -93,6 +95,8 @@ export async function generateCreatureDetails(
 
     stream.done();
   })();
+
+  revalidatePath(`/pic/${creatureId}`);
 
   return { object: stream.value };
 }
