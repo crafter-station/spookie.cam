@@ -54,6 +54,12 @@ export const getCreaturesPage = cache(async (page: number) => {
     LIMIT ${PAGE_SIZE} 
     OFFSET ${offset};
   `;
+
+  if (page === 1) {
+    const midu = await getCreature('Xo6cQidc');
+    return [midu, ...rows];
+  }
+
   return rows;
 });
 

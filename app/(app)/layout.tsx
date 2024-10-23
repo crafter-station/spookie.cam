@@ -2,19 +2,23 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 
 import { GalleryVerticalIcon, UserIcon } from 'lucide-react';
+import { Metadata } from 'next';
 
 import { buttonVariants } from '@/components/ui/button';
-import { NavbarShader } from '@/components/nav-bar-shader';
 
 import { cn } from '@/lib/utils';
 
 import { NewPic } from './new-pic';
 
+export const metadata: Metadata = {
+  title: 'spookie.cam',
+  description: 'Upload your creepy pics to spookie.cam',
+};
+
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <nav className="sticky top-0 z-50 mx-auto flex h-16 max-w-6xl items-center justify-between bg-transparent px-4 md:px-8">
-        <NavbarShader />
         <Link href="/" className="font-vcr text-2xl font-black">
           spookie.cam
         </Link>

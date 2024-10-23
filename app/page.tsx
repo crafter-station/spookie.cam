@@ -3,14 +3,12 @@ import Link from 'next/link';
 import { CircleIcon, PlayIcon } from 'lucide-react';
 
 import { SpookyButton } from '@/components/ui/icons';
-import FoggyBackground from '@/components/foggy-background';
 
 import { CDate } from './c-date';
 
 export default function Home() {
   return (
     <>
-      <FoggyBackground />
       <div className="container mx-auto flex h-screen flex-col items-center justify-center py-8">
         <div className="absolute left-8 top-8 flex items-center font-vcr text-4xl font-black tracking-[0.3em] opacity-50">
           PLAY
@@ -20,21 +18,25 @@ export default function Home() {
           REC
           <CircleIcon
             fill="currentColor"
-            className="ml-2 inline size-6 animate-pulse text-red-500"
+            className="ml-2 inline size-6 animate-pulse text-red-900"
           />
         </div>
         <CDate />
         <h1 className="mb-6 text-center text-3xl font-bold">
           Welcome to{' '}
-          <span className="block text-8xl text-red-500">spookie.cam</span>
+          <span className="block text-8xl text-red-900">spookie.cam</span>
         </h1>
         <p className="text-center text-xl">
           You are about to enter a world of horror and terror. Are you ready?
         </p>
 
-        <Link href="/catalog" className="group relative my-8">
-          <SpookyButton className="w-[20rem] text-red-500 drop-shadow-lg group-hover:text-white group-focus:text-white group-focus:outline-none group-focus:ring-0" />
-          <span className="absolute inset-0 flex items-center justify-center pb-2 text-3xl font-black group-hover:text-red-500 group-focus:text-red-500">
+        <Link
+          href="/catalog"
+          className="group relative my-8"
+          id="continue-button"
+        >
+          <SpookyButton className="w-[20rem] text-red-900 drop-shadow-lg group-hover:text-white group-focus:text-white group-focus:outline-none group-focus:ring-0" />
+          <span className="absolute inset-0 flex items-center justify-center pb-2 text-3xl font-black group-hover:text-red-900 group-focus:text-red-900">
             Continue
           </span>
         </Link>
