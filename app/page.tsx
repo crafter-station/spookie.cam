@@ -5,6 +5,7 @@ import { CircleIcon, PlayIcon } from 'lucide-react';
 import { SpookyButton } from '@/components/ui/icons';
 
 import { CDate } from './c-date';
+import PlayScream from './play-scream';
 
 export default function Home() {
   return (
@@ -44,6 +45,7 @@ export default function Home() {
         <p className="mt-64 text-center text-xl text-muted-foreground">
           Images may be disturbing. Viewer discretion is advised.
         </p>
+        <PlayScream />
       </div>
     </>
   );

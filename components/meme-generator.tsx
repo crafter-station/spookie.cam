@@ -119,7 +119,16 @@ export const MemeGenerator = ({ id }: MemeGeneratorProps) => {
   }, [id]);
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(val) => {
+        const backgroundNoiseSoundButton = document.getElementById(
+          'background-noise-button',
+        );
+        backgroundNoiseSoundButton?.click();
+        setIsDialogOpen(val);
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">
           <PlusIcon className="mr-2 size-4" />

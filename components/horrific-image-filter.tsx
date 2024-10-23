@@ -461,11 +461,6 @@ export function HorrificImageFilter() {
   useEffect(() => {
     const loader = new THREE.TextureLoader();
     loader.load('/man-3.webp', (loadedTexture) => {
-      console.log(
-        'Texture loaded:',
-        loadedTexture.image.width,
-        loadedTexture.image.height,
-      );
       setTexture(loadedTexture);
     });
   }, []);

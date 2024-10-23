@@ -27,7 +27,7 @@ export const BackgroundNoiseAudioPlayButton = () => {
 
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
   const audioRef = useRef(new Audio(BACKGROUND_NOISE_AUDIO_URLS[0]));
-  const autoplayTimeoutRef = useRef(null);
+  const autoplayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -66,7 +66,7 @@ export const BackgroundNoiseAudioPlayButton = () => {
         clearTimeout(autoplayTimeoutRef.current);
       }
     };
-  }, []);
+  }, [currentAudioIndex]);
 
   // Effect to handle playing/pausing and saving preference
   useEffect(() => {
